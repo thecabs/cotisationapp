@@ -1,0 +1,18 @@
+{
+     "cmake.sourceDirectory": "${workspaceFolder}/linux",
+     "sqltools.connections": [
+          {
+               "mysqlOptions": {
+                    "authProtocol": "default"
+               },
+               "previewLimit": 50,
+               "server": "109.106.240.4",
+               "port": 3306,
+               "driver": "MariaDB",
+               "name": "db_",
+               "username": "u771965123_wazi",
+               "database": "u771965123_wazi",
+               "password": "Mama2000"
+          }
+     ]
+}

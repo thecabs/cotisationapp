@@ -25,7 +25,7 @@ class CotisationScreen extends StatelessWidget {
   var idAgence;
   var code;
   var attemps = 3;
-  var enable=true;
+  var enable = true;
   // form key for client's cotisation
   final formKeyCotisation = GlobalKey<FormState>();
   final numCompteClientController = TextEditingController();
@@ -79,6 +79,7 @@ class CotisationScreen extends StatelessWidget {
                 TextButton(
                     onPressed: () async {
                       var instance = await SharedPreferences.getInstance();
+
                       instance.setBool("login", false);
                       // ignore: use_build_context_synchronously
                       Navigator.of(context).pushAndRemoveUntil(
@@ -93,12 +94,11 @@ class CotisationScreen extends StatelessWidget {
               ],
             );
           });
-
     }
 
     _showInformations2() async {
-      var msg=AppLocalizations.of(context)!
-                                          .attemps +' '+ attemps.toString();
+      var msg =
+          AppLocalizations.of(context)!.attemps + ' ' + attemps.toString();
       return showDialog(
           context: context,
           builder: (context) {
@@ -110,23 +110,18 @@ class CotisationScreen extends StatelessWidget {
               backgroundColor: AppColors.background,
               surfaceTintColor: AppColors.background,
               content: SingleChildScrollView(
-                
-                child:ListBody(
-                  children:  <Widget> [
-                    Text(msg),
-                  ],
-                ) 
-
-              ),
-              actions:<Widget> [
-                TextButton(onPressed: ()=>{
-                  Navigator.of(context).pop()
-                }, 
-                child: const Text("OK"))
-              ], 
+                  child: ListBody(
+                children: <Widget>[
+                  Text(msg),
+                ],
+              )),
+              actions: <Widget>[
+                TextButton(
+                    onPressed: () => {Navigator.of(context).pop()},
+                    child: const Text("OK"))
+              ],
             );
           });
-          
     }
 
     clearFields() {
@@ -513,52 +508,59 @@ class CotisationScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 20.0),
                           ButtonComponent(
-                            onPressed: enable? () async {
-                              //*****
-                              enable=false;
-                              var code2 = userCodeController.text.trim();
-                              if (code2 == userModel.code) {
-                                attemps=3;
-                                if (formKeyCotisation.currentState!
-                                    .validate()) {
-                                  final cotisationModel = CotisationModel(
-                                      montant: int.tryParse(
-                                          montantClientController.text.trim())!,
-                                      date: CustomDate.now(),
-                                      heure: CustomDate.hour(),
-                                      idAgence: int.parse(idAgence),
-                                      idClient: int.tryParse(idClient.trim())!,
-                                      idUser: userModel.id!,
-                                      mobile:
-                                          numeroClientController.text.trim(),
-                                      numCompte:
-                                          numCompteClientController.text.trim(),
-                                      nom: nomClientController.text.trim());
+                            onPressed: enable
+                                ? () async {
+                                    //*****
+                                    enable = false;
+                                    var code2 = userCodeController.text.trim();
+                                    if (code2 == userModel.code) {
+                                      attemps = 3;
+                                      if (formKeyCotisation.currentState!
+                                          .validate()) {
+                                        final cotisationModel = CotisationModel(
+                                            montant: int.tryParse(
+                                                montantClientController.text
+                                                    .trim())!,
+                                            date: CustomDate.now(),
+                                            heure: CustomDate.hour(),
+                                            idAgence: int.parse(idAgence),
+                                            idClient:
+                                                int.tryParse(idClient.trim())!,
+                                            idUser: userModel.id!,
+                                            mobile: numeroClientController.text
+                                                .trim(),
+                                            numCompte: numCompteClientController
+                                                .text
+                                                .trim(),
+                                            nom: nomClientController.text
+                                                .trim());
 
-                                  BlocProvider.of<CotisationBloc>(context).add(
-                                      CotisationOnSaveEvent(
-                                          cotisationModel: cotisationModel));
-                                }
-                              } else {
-                                attemps = attemps - 1;
-                                if(attemps>0){
-                                  _showInformations2();
-
-                                }
-                                else{
-                                  var instance =  await SharedPreferences.getInstance();
-                                  instance.setBool("login", false);
-                                  // ignore: use_build_context_synchronously
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                          builder: (context) => AuthenticationScreen()),
-                                      (route) => false);
-
-                                }
-                                //==============
-                              }
-                              enable=true;
-                            }: null,
+                                        BlocProvider.of<CotisationBloc>(context)
+                                            .add(CotisationOnSaveEvent(
+                                                cotisationModel:
+                                                    cotisationModel));
+                                      }
+                                    } else {
+                                      attemps = attemps - 1;
+                                      if (attemps > 0) {
+                                        _showInformations2();
+                                      } else {
+                                        var instance = await SharedPreferences
+                                            .getInstance();
+                                        instance.setBool("login", false);
+                                        // ignore: use_build_context_synchronously
+                                        Navigator.of(context)
+                                            .pushAndRemoveUntil(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        AuthenticationScreen()),
+                                                (route) => false);
+                                      }
+                                      //==============
+                                    }
+                                    enable = true;
+                                  }
+                                : null,
                             color: AppColors.backgroundButton,
                             child: TypoText(
                                     text: (state is CotisationWaitingSave ||

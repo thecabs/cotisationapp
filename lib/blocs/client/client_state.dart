@@ -41,7 +41,6 @@ class AddClientSelectSecondDateCNIState extends AddClientState {
   List<Object> get props => [date1];
 }
 
-//// recherche precision waiting state
 class AddClientDataWaitingState extends AddClientState {
   const AddClientDataWaitingState();
 
@@ -49,18 +48,54 @@ class AddClientDataWaitingState extends AddClientState {
   List<Object> get props => [];
 }
 
-//// recherche precision state
-class AddClientDataSuccessState extends AddClientState {
-  final List<CotisationModel> cotisationModel;
-  const AddClientDataSuccessState({required this.cotisationModel});
-
-  @override
-  List<Object> get props => [cotisationModel];
-}
-
-class AddClientWaitingSubmitData extends AddClientState {
-  const AddClientWaitingSubmitData();
+class AddClientWaitingSave extends AddClientState {
+  const AddClientWaitingSave();
 
   @override
   List<Object> get props => [];
+}
+
+class ClientSave extends AddClientState {
+  const ClientSave();
+
+  @override
+  List<Object> get props => [];
+}
+
+class ClientErrorSave extends AddClientState {
+  const ClientErrorSave();
+
+  @override
+  List<Object> get props => [];
+}
+
+class ClientErrorState extends AddClientState {
+  const ClientErrorState();
+
+  @override
+  List<Object> get props => [];
+}
+
+class ClientSaveState extends AddClientState {
+  final int id;
+  final String nom;
+  final String username;
+  final String adresse;
+  final int idAgence;
+  //added
+  final String code;
+  final int idZone;
+
+  const ClientSaveState(
+      {required this.id,
+      required this.nom,
+      required this.adresse,
+      required this.username,
+      required this.idAgence,
+      required this.idZone,
+      required this.code});
+
+  @override
+  List<Object> get props =>
+      [id, nom, username, adresse, idAgence, idZone, code];
 }

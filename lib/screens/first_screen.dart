@@ -42,19 +42,19 @@ class FirstScreen extends StatelessWidget {
             }
             if (state is FirstScreenGoMainScreenState) {
               UserModel userModel = UserModel(
-                  id: state.id,
-                  banqueId: null,
-                  username: state.username,
-                  nom: state.nom,
-                  mobile: null,
-                  password: null,
-                  adresse: state.adresse,
-                  type: null,
-                  actif: null,
-                  idAgence: state.idAgence,
-                  idZone: state.idZone,
-                  code: state.code,
-                  );
+                id: state.id,
+                banqueId: null,
+                username: state.username,
+                nom: state.nom,
+                mobile: null,
+                password: null,
+                adresse: state.adresse,
+                type: null,
+                actif: null,
+                idAgence: state.idAgence,
+                idZone: state.idZone,
+                code: state.code,
+              );
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
                       builder: (context) => MainScreen(userModel: userModel)),

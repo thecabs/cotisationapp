@@ -58,7 +58,16 @@
   "welcome_more_app": "Veuillez entrer des informations du serveur et l'ID de la banque.",
   "with_precision": "Sans précision",
   "man":"Masculin",
-  "women":"Feminin"
+  "women":"Feminin",
+   "error_mobile":"Mobile incorrect",
+   "error_birthday":"Date Naissance Incorrecte",
+   "error_cni":"Numéro CNI Incorrect",
+   "error_datecni":"Date Delivrance Incorrecte",
+   "error_addclient":"Echec D'enregistrement",
+   "addclient":"Enregistrement en cours...",
+   "addclientsuccess":"Client Enregistré avec succès",
+   "datedelcni":"Date Delivrance"
+    
   
   
 }

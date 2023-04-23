@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gpt/screens/addclient_step1_screen.dart';
 import 'package:gpt/screens/client_screen.dart';
+import 'package:gpt/screens/clientcamera_screen.dart';
 import 'package:gpt/screens/cotisation_screen.dart';
 import 'package:gpt/screens/search_screen.dart';
+import 'package:gpt/screens/stepper.dart';
 
 import '../models/user_model.dart';
 import '../utils/app_colors.dart';
@@ -26,7 +29,11 @@ class _MainScreenState extends State<MainScreen> {
     List body = [
       CotisationScreen(userModel: widget.userModel),
       SearchScreen(userModel: widget.userModel),
-      ClientScreen(),
+      //AddClientStep1Screen(),
+      //CheckoutPage(),
+      //AddClientView(userModel: widget.userModel),
+      ClientScreen(userModel: widget.userModel),
+      Camera()
     ];
 
     return Scaffold(
@@ -59,6 +66,9 @@ class _MainScreenState extends State<MainScreen> {
               label: AppLocalizations.of(context)!.search),
           BottomNavigationBarItem(
               icon: const Icon(Icons.group),
+              label: AppLocalizations.of(context)!.client),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.camera_front),
               label: AppLocalizations.of(context)!.client)
         ],
       ),

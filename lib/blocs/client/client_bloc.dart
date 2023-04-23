@@ -1,6 +1,7 @@
 // ignore: depend_on_referenced_packages
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:gpt/models/addclient_model.dart';
 import 'package:gpt/models/cotisation_model.dart';
 import 'package:gpt/services/addclient_service.dart';
 
@@ -28,6 +29,18 @@ class AddClientBloc extends Bloc<AddClientEvent, AddClientState> {
 
     on<AddClientInitialEvent>((event, emit) {
       emit(AddClientInitial());
+    });
+
+    on<AddClientDataEvent>((event, emit) async {
+      emit(const AddClientWaitingSave());
+      bool response = await addclientService.saveclient(
+          addClientModel: event.addclientModel);
+
+      if (response) {
+        emit(const ClientSave());
+      } else {
+        emit(const ClientErrorSave());
+      }
     });
   }
 }

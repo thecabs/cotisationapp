@@ -18,18 +18,17 @@ class AuthenticationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     var bank_name = "";
 
     return BlocProvider(
-      create: (context) => AuthenticationBloc()..add(AuthenticationOnLoadNameBank()),
+      create: (context) =>
+          AuthenticationBloc()..add(AuthenticationOnLoadNameBank()),
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: AppColors.background,
         ),
         body: BlocConsumer<AuthenticationBloc, AuthenticationState>(
           listener: (context, state) {
-
             if (state is AuthenticationLoadName) {
               bank_name = state.bankName;
             }
@@ -60,8 +59,7 @@ class AuthenticationScreen extends StatelessWidget {
                 children: [
                   Center(
                     child: TypoText(
-                            text: bank_name,
-                            color: AppColors.colorTextInput)
+                            text: bank_name, color: AppColors.colorTextInput)
                         .large(),
                   ),
                   TypoText(

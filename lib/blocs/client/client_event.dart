@@ -42,17 +42,16 @@ class AddClientSelectSecondDateCNIEvent extends AddClientEvent {
 }
 
 class AddClientDataEvent extends AddClientEvent {
-  final String date1;
-  final String date2;
-  final String numCompte;
-  final String idUser;
-
-  const AddClientDataEvent(
-      {required this.date1,
-      required this.date2,
-      required this.numCompte,
-      required this.idUser});
+  final AddClientModel addclientModel;
+  const AddClientDataEvent({required this.addclientModel});
 
   @override
-  List<Object> get props => [date1, date2, numCompte, idUser];
+  List<Object> get props => [addclientModel];
+}
+
+class AddClientStep1Event extends AddClientEvent {
+  const AddClientStep1Event();
+
+  @override
+  List<Object> get props => [];
 }

@@ -14,7 +14,6 @@ class AuthenticationBloc
 
   AuthenticationBloc() : super(AuthenticationInitial()) {
     on<AuthenticationOnLoginEvent>((event, emit) async {
-
       var instance = await SharedPreferences.getInstance();
 
       emit(const AuthenticationOnLoginWait());
@@ -31,7 +30,7 @@ class AuthenticationBloc
         instance.setInt("id_agence", userModel.idAgence!);
         instance.setInt("id_zone", userModel.idZone!);
         instance.setString("code_user", userModel.code!);
-        
+
         emit(AuthenticationOnLoginSuccess(userModel: userModel));
       } else {
         emit(const AuthenticationOnLoginError());
@@ -39,12 +38,10 @@ class AuthenticationBloc
     });
 
     on<AuthenticationOnLoadNameBank>((event, emit) async {
-
       var instance = await SharedPreferences.getInstance();
       String? bankName = instance.getString("bank_name");
 
       emit(AuthenticationLoadName(bankName: bankName!));
-
     });
   }
 }

@@ -58,5 +58,15 @@
   "women":"Female",
   "placecni":"Place NIC",
   "fr":"French",
-  "en":"English"
+  "en":"English",
+  "error_mobile":"Incorrect mobile",
+   "error_birthday":"Date of Birth Incorrect",
+   "error_cni":"Incorrect NIC number",
+   "error_datecni":"Incorrect Delivery Date",
+   "error_addclient":"Registration Failure",
+   "addclient":"Registration in progress...",
+   "addclientsuccess":" Successfully registered customer",
+   "datedelcni":"Delivery Date"
+
+
 }

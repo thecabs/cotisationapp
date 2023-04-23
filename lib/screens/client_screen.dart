@@ -6,6 +6,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gpt/components/button_component.dart';
 import 'package:gpt/models/user_model.dart';
+import 'package:gpt/models/addclient_model.dart';
 import '../utils/app_colors.dart';
 import '../utils/custom_date.dart';
 import '../utils/typography.dart';
@@ -21,21 +22,32 @@ class AddClientView extends StatelessWidget {
       // providers: [
       //   BlocProvider<AddClientBloc>(create: (context) => AddClientBloc()),
       // ],
-      child: ClientScreen(),
+      child: ClientScreen(
+        userModel: userModel,
+      ),
     );
   }
 }
 
 class ClientScreen extends StatefulWidget {
-  const ClientScreen({super.key});
+  final UserModel userModel;
+  const ClientScreen({
+    super.key,
+    required this.userModel,
+  });
   @override
   State<ClientScreen> createState() => _ClientScreenState();
 }
 
 class _ClientScreenState extends State<ClientScreen> {
-  final formKey = GlobalKey<FormState>();
-  final formKeyDoc = GlobalKey<FormState>();
+  //final formKey = GlobalKey<FormState>();
+
+  final formKeyCNI = GlobalKey<FormState>();
   final formKeyClient = GlobalKey<FormState>();
+  bool step1ok = false;
+  bool step2ok = false;
+  var idClient;
+  var idAgence;
 
   // controllers client
   final mobilecontroller = TextEditingController();
@@ -60,7 +72,7 @@ class _ClientScreenState extends State<ClientScreen> {
 
   // verification of fields
   bool mobileConfirmed() {
-    if (mobilecontroller.text.trim() == cmobilecontroller.text.trim()) {
+    if (mobilecontroller.value == cmobilecontroller.value) {
       return true;
     } else {
       return false;
@@ -68,7 +80,8 @@ class _ClientScreenState extends State<ClientScreen> {
   }
 
   bool dateNConfirmed() {
-    if (firstDateNController.text.trim() == secondDateNController.text.trim()) {
+    if (firstDateNController.text.toString() ==
+        secondDateNController.text.toString()) {
       return true;
     } else {
       return false;
@@ -76,35 +89,120 @@ class _ClientScreenState extends State<ClientScreen> {
   }
 
   bool dateCNIConfirmed() {
-    if (firstDateCNIController.text.trim() ==
-        secondDateCNIController.text.trim()) {
+    if (firstDateCNIController.text.toString() ==
+        secondDateCNIController.text.toString()) {
       return true;
     } else {
       return false;
     }
   }
 
-  Future nextstep() async {
-    if (mobileConfirmed() == true) {
-      if (dateNConfirmed() == true) {}
+  bool ncniConfirmed() {
+    if (ncniController.text.toString() == cncniController.text.toString()) {
+      return true;
     } else {
-      mobilecontroller.clear();
-      cmobilecontroller.clear();
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              backgroundColor: AppColors.background,
-              content: TypoText(
-                      text: AppLocalizations.of(context)!.authentication_error,
-                      color: AppColors.colorTextInput)
-                  .longCast(),
-            );
-          });
+      return false;
     }
   }
 
-  Future validate() async {}
+  // bool datecniConfirmed() {
+  //   if (firstDateCNIController.value == secondDateCNIController.value) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // }
+
+  verificationstep1() {
+    // do {
+    //   firstDateNController.clear();
+    //   secondDateNController.clear();
+    //   showDialog(
+    //       context: context,
+    //       builder: (context) {
+    //         return AlertDialog(
+    //           backgroundColor: AppColors.backgroundButton,
+    //           content: TypoText(
+    //                   text: "Date Naissance Incorrecte",
+    //                   color: AppColors.colorTextInput)
+    //               .long(),
+    //         );
+    //       });
+    // } while (dateNConfirmed() == false);
+
+    // do {
+    //   mobilecontroller.clear();
+    //   cmobilecontroller.clear();
+    //   showDialog(
+    //       context: context,
+    //       builder: (context) {
+    //         return AlertDialog(
+    //           backgroundColor: AppColors.backgroundButton,
+    //           content: TypoText(
+    //                   text: "Mobile Incorrect", color: AppColors.colorTextInput)
+    //               .long(),
+    //         );
+    //       });
+    // } while (mobileConfirmed() == false);
+
+    if (mobileConfirmed() == true) {
+      if (dateNConfirmed() == true) {
+        onStepContinue();
+      } else {
+        firstDateNController.clear();
+        secondDateNController.clear();
+        hideSnackBar(context);
+        showSnackBar(context, AppLocalizations.of(context)!.error_birthday, 4);
+      }
+    } else {
+      mobilecontroller.clear();
+      cmobilecontroller.clear();
+
+      hideSnackBar(context);
+      showSnackBar(context, AppLocalizations.of(context)!.error_mobile, 4);
+    }
+  }
+
+  verificationstep2() {
+    if (ncniConfirmed() == true) {
+      if (dateCNIConfirmed() == true) {
+        step2ok = true;
+        return step2ok;
+      } else {
+        firstDateCNIController.clear();
+        secondDateCNIController.clear();
+        hideSnackBar(context);
+        showSnackBar(context, AppLocalizations.of(context)!.error_datecni, 4);
+      }
+    } else {
+      ncniController.clear();
+      cncniController.clear();
+      hideSnackBar(context);
+      showSnackBar(context, AppLocalizations.of(context)!.error_cni, 4);
+    }
+  }
+
+  // Future nextstep1() async {
+  //   do {
+  //     mobilecontroller.clear();
+  //     cmobilecontroller.clear();
+  //     firstDateNController.clear();
+  //     secondDateNController.clear();
+  //     showDialog(
+  //         context: context,
+  //         builder: (context) {
+  //           return AlertDialog(
+  //             backgroundColor: AppColors.backgroundButton,
+  //             content: TypoText(
+  //                     text: AppLocalizations.of(context)!.authentication_error,
+  //                     color: AppColors.colorTextInput)
+  //                 .longCast(),
+  //           );
+  //         });
+  //   } while (mobileConfirmed() == true && dateNConfirmed() == true);
+  // }
+
+  // Future validate() async {}
 
   // configuration stepper
   int currentStep = 0;
@@ -127,7 +225,7 @@ class _ClientScreenState extends State<ClientScreen> {
 
   onStepTapped(int value) async {
     setState(() {
-      currentStep = value;
+      //currentStep = value;
     });
   }
 
@@ -160,10 +258,18 @@ class _ClientScreenState extends State<ClientScreen> {
         ),
         body: BlocConsumer<AddClientBloc, AddClientState>(
             listener: (context, state) {
-          if (state is AddClientInitial) {
+          if (state is ClientErrorSave) {
+            hideSnackBar(context);
+
+            showSnackBar(
+                context, AppLocalizations.of(context)!.error_addclient, 2);
+          }
+          if (state is ClientSave) {
+            hideSnackBar(context);
+            showSnackBar(
+                context, AppLocalizations.of(context)!.addclientsuccess, 5);
             clearFields();
           }
-
           if (state is AddClientSelectFirstDateNState) {
             firstDateNController.text = CustomDate.custom(state.date);
           }
@@ -193,8 +299,135 @@ class _ClientScreenState extends State<ClientScreen> {
                   currentStep: currentStep,
                   onStepContinue: onStepContinue,
                   onStepCancel: onStepCancel,
-                  onStepTapped: onStepTapped,
-                  controlsBuilder: controlsBuilder,
+                  //onStepTapped: onStepTapped,
+                  controlsBuilder:
+                      (BuildContext context, ControlsDetails controls) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          if (currentStep == 0)
+                            ButtonComponent(
+                                onPressed: () {
+                                  print(widget.userModel.idZone);
+
+                                  if (formKeyClient.currentState!.validate()) {
+                                    verificationstep1();
+                                  }
+                                },
+                                child: TypoText(
+                                        text:
+                                            AppLocalizations.of(context)!.next,
+                                        color: AppColors.colorTextWhite)
+                                    .h2(),
+                                color: AppColors.backgroundButton),
+                          // ButtonComponent(
+                          //     onPressed: controls.onStepContinue,
+                          //     child: currentStep > 0
+                          //         ? InkWell(
+                          //             onTap: () {
+                          //               if (formKeyCNI.currentState!
+                          //                   .validate()) {
+                          //                 do {
+                          //                   //controls.onStepContinue;
+                          //                   verificationstep2();
+                          //                 } while (step1ok);
+                          //               }
+                          //             },
+                          //             child: TypoText(
+                          //                     text:
+                          //                         AppLocalizations.of(context)!
+                          //                             .validate,
+                          //                     color: AppColors.colorTextWhite)
+                          //                 .h2(),
+                          //           )
+                          //         : GestureDetector(
+                          //             onTap: () {
+                          //               if (formKeyClient.currentState!
+                          //                   .validate()) {
+                          //                 do {
+                          //                   controls.onStepContinue;
+                          //                   verificationstep1();
+                          //                 } while (step2ok);
+
+                          //                 //verificationstep1();
+                          //               }
+                          //             },
+                          //             child: TypoText(
+                          //                     text:
+                          //                         AppLocalizations.of(context)!
+                          //                             .next,
+                          //                     color: AppColors.colorTextWhite)
+                          //                 .h2(),
+                          //           ),
+                          //     color: AppColors.backgroundButton),
+                          // if (currentStep == 1)
+                          //   Row(
+                          //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          //     children: [
+                          //       ButtonComponent(
+                          //           onPressed: controls.onStepCancel,
+                          //           child: TypoText(
+                          //                   text: AppLocalizations.of(context)!
+                          //                       .cancel,
+                          //                   color: AppColors.backgroundButton)
+                          //               .h2(),
+                          //           color: AppColors.background),
+                          if (currentStep == 1)
+                            ButtonComponent(
+                                onPressed: controls.onStepCancel,
+                                child: TypoText(
+                                        text: AppLocalizations.of(context)!
+                                            .cancel,
+                                        color: AppColors.background)
+                                    .h2(),
+                                color: AppColors.backgroundButton),
+                          if (currentStep == 1)
+                            ButtonComponent(
+                              onPressed: () {
+                                if (formKeyCNI.currentState!.validate()) {
+                                  verificationstep2();
+                                  if (step2ok == true) {
+                                    final addclientModel = AddClientModel(
+                                      mobile: mobilecontroller.text.trim(),
+                                      username: nomController.text,
+                                      daten: firstDateCNIController.text.trim(),
+                                      lieun: lieuNController.text.trim(),
+                                      genre: selectedGenretype.toString(),
+                                      lang: selectedLangtype.toString(),
+                                      numcni: ncniController.text.trim(),
+                                      datecni:
+                                          firstDateCNIController.text.trim(),
+                                      lieucni: lieuCNIController.text.trim(),
+                                      profession:
+                                          professionController.text.trim(),
+                                      idUser: widget.userModel.id!,
+                                      idAgence: widget.userModel.idAgence,
+                                      idZone: widget.userModel.idZone!,
+                                    );
+                                    context
+                                        .read<AddClientBloc>()
+                                        .add(AddClientDataEvent(
+                                          addclientModel: addclientModel,
+                                        ));
+                                  }
+                                }
+                              },
+                              color: AppColors.backgroundButton,
+                              child: TypoText(
+                                      text: (state is ClientSave)
+                                          ? AppLocalizations.of(context)!
+                                              .addclient
+                                          : AppLocalizations.of(context)!
+                                              .validate,
+                                      color: AppColors.colorTextWhite)
+                                  .h2(),
+                            )
+                        ],
+                      ),
+                    );
+                  },
                   elevation: 0,
                   steps: [
                     Step(
@@ -231,7 +464,7 @@ class _ClientScreenState extends State<ClientScreen> {
                                                 fontWeight: FontWeight.w400),
                                             cursorColor:
                                                 AppColors.colorTextInput,
-                                            keyboardType: TextInputType.text,
+                                            keyboardType: TextInputType.number,
                                             decoration: InputDecoration(
                                               errorStyle: TextStyle(
                                                   color: AppColors.red),
@@ -279,7 +512,7 @@ class _ClientScreenState extends State<ClientScreen> {
                                                 fontWeight: FontWeight.w400),
                                             cursorColor:
                                                 AppColors.colorTextInput,
-                                            keyboardType: TextInputType.text,
+                                            keyboardType: TextInputType.number,
                                             decoration: InputDecoration(
                                                 errorStyle: TextStyle(
                                                     color: AppColors.red),
@@ -769,323 +1002,337 @@ class _ClientScreenState extends State<ClientScreen> {
                                 text: AppLocalizations.of(context)!.cni,
                                 color: AppColors.colorTextInput)
                             .longCast(),
-                        content: Column(
-                          children: [
-                            Form(
-                              key: formKeyDoc,
-                              child: Column(
-                                children: [
-                                  const SizedBox(height: 16.0),
-                                  TextFormField(
-                                    controller: ncniController,
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    style: GoogleFonts.inter(
-                                        color: AppColors.colorTextInput,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w400),
-                                    cursorColor: AppColors.colorTextInput,
-                                    keyboardType: TextInputType.text,
-                                    decoration: InputDecoration(
-                                      errorStyle:
-                                          TextStyle(color: AppColors.red),
-                                      filled: true,
-                                      fillColor: AppColors.background2,
-                                      border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16.0),
-                                          borderSide: BorderSide.none),
-                                      labelText:
-                                          AppLocalizations.of(context)!.cni,
-                                      labelStyle: GoogleFonts.inter(
-                                          color: Colors.blue,
+                        content: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              Form(
+                                key: formKeyCNI,
+                                child: Column(
+                                  children: [
+                                    const SizedBox(height: 16.0),
+                                    TextFormField(
+                                      controller: ncniController,
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                      style: GoogleFonts.inter(
+                                          color: AppColors.colorTextInput,
                                           fontSize: 15,
                                           fontWeight: FontWeight.w400),
-                                      hintText:
-                                          AppLocalizations.of(context)!.cni,
-                                      hintStyle: GoogleFonts.inter(
-                                          color: Colors.grey,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w400),
+                                      cursorColor: AppColors.colorTextInput,
+                                      keyboardType: TextInputType.text,
+                                      decoration: InputDecoration(
+                                        errorStyle:
+                                            TextStyle(color: AppColors.red),
+                                        filled: true,
+                                        fillColor: AppColors.background2,
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(16.0),
+                                            borderSide: BorderSide.none),
+                                        labelText:
+                                            AppLocalizations.of(context)!.cni,
+                                        labelStyle: GoogleFonts.inter(
+                                            color: Colors.blue,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w400),
+                                        hintText:
+                                            AppLocalizations.of(context)!.cni,
+                                        hintStyle: GoogleFonts.inter(
+                                            color: Colors.grey,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      validator: (value) {
+                                        if (value!.isEmpty) {
+                                          return AppLocalizations.of(context)!
+                                              .empty_input;
+                                        }
+                                        return null;
+                                      },
                                     ),
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return AppLocalizations.of(context)!
-                                            .empty_input;
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 16.0),
-                                  TextFormField(
-                                    controller: cncniController,
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    style: GoogleFonts.inter(
-                                        color: AppColors.colorTextInput,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w400),
-                                    cursorColor: AppColors.colorTextInput,
-                                    keyboardType: TextInputType.text,
-                                    decoration: InputDecoration(
-                                      errorStyle:
-                                          TextStyle(color: AppColors.red),
-                                      filled: true,
-                                      fillColor: AppColors.background2,
-                                      border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16.0),
-                                          borderSide: BorderSide.none),
-                                      labelText:
-                                          AppLocalizations.of(context)!.cni,
-                                      labelStyle: GoogleFonts.inter(
-                                          color: Colors.blue,
+                                    const SizedBox(height: 16.0),
+                                    TextFormField(
+                                      controller: cncniController,
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                      style: GoogleFonts.inter(
+                                          color: AppColors.colorTextInput,
                                           fontSize: 15,
                                           fontWeight: FontWeight.w400),
-                                      hintText:
-                                          AppLocalizations.of(context)!.cni,
-                                      hintStyle: GoogleFonts.inter(
-                                          color: Colors.grey,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w400),
+                                      cursorColor: AppColors.colorTextInput,
+                                      keyboardType: TextInputType.text,
+                                      decoration: InputDecoration(
+                                        errorStyle:
+                                            TextStyle(color: AppColors.red),
+                                        filled: true,
+                                        fillColor: AppColors.background2,
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(16.0),
+                                            borderSide: BorderSide.none),
+                                        labelText:
+                                            AppLocalizations.of(context)!.cni,
+                                        labelStyle: GoogleFonts.inter(
+                                            color: Colors.blue,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w400),
+                                        hintText:
+                                            AppLocalizations.of(context)!.cni,
+                                        hintStyle: GoogleFonts.inter(
+                                            color: Colors.grey,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      validator: (value) {
+                                        if (value!.isEmpty) {
+                                          return AppLocalizations.of(context)!
+                                              .empty_input;
+                                        }
+                                        return null;
+                                      },
                                     ),
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return AppLocalizations.of(context)!
-                                            .empty_input;
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 16.0),
-                                  Row(
-                                    children: [
-                                      Flexible(
-                                        child: TextFormField(
-                                          controller: firstDateCNIController,
-                                          readOnly: true,
-                                          autovalidateMode: AutovalidateMode
-                                              .onUserInteraction,
-                                          style: GoogleFonts.inter(
-                                              color: AppColors.colorTextInput,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w400),
-                                          cursorColor: AppColors.colorTextInput,
-                                          keyboardType: TextInputType.datetime,
-                                          decoration: InputDecoration(
-                                            errorStyle:
-                                                TextStyle(color: AppColors.red),
-                                            filled: true,
-                                            fillColor: AppColors.background2,
-                                            border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(16.0),
-                                                borderSide: BorderSide.none),
-                                            hintText:
-                                                AppLocalizations.of(context)!
-                                                    .date,
-                                            hintStyle: GoogleFonts.inter(
-                                                color: Colors.blue,
+                                    const SizedBox(height: 16.0),
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                          child: TextFormField(
+                                            controller: firstDateCNIController,
+                                            readOnly: true,
+                                            autovalidateMode: AutovalidateMode
+                                                .onUserInteraction,
+                                            style: GoogleFonts.inter(
+                                                color: AppColors.colorTextInput,
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.w400),
-                                          ),
-                                          validator: (value) {
-                                            if (value!.isEmpty) {
-                                              return AppLocalizations.of(
-                                                      context)!
-                                                  .empty_input;
-                                            }
-                                            return null;
-                                          },
-                                          onTap: () async {
-                                            DateTime? pickedDate1 =
-                                                await showDatePicker(
-                                                    context: context,
-                                                    keyboardType:
-                                                        TextInputType.datetime,
-                                                    initialDate: DateTime.now(),
-                                                    firstDate: DateTime(1900),
-                                                    lastDate: DateTime(3000));
+                                            cursorColor:
+                                                AppColors.colorTextInput,
+                                            keyboardType:
+                                                TextInputType.datetime,
+                                            decoration: InputDecoration(
+                                              errorStyle: TextStyle(
+                                                  color: AppColors.red),
+                                              filled: true,
+                                              fillColor: AppColors.background2,
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          16.0),
+                                                  borderSide: BorderSide.none),
+                                              hintText:
+                                                  AppLocalizations.of(context)!
+                                                      .datedelcni,
+                                              hintStyle: GoogleFonts.inter(
+                                                  color: Colors.blue,
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                            validator: (value) {
+                                              if (value!.isEmpty) {
+                                                return AppLocalizations.of(
+                                                        context)!
+                                                    .empty_input;
+                                              }
+                                              return null;
+                                            },
+                                            onTap: () async {
+                                              DateTime? pickedDate1 =
+                                                  await showDatePicker(
+                                                      context: context,
+                                                      keyboardType:
+                                                          TextInputType
+                                                              .datetime,
+                                                      initialDate:
+                                                          DateTime.now(),
+                                                      firstDate: DateTime(1900),
+                                                      lastDate: DateTime(3000));
 
-                                            /// check if date isn't null
-                                            if (pickedDate1 != null) {
-                                              // ignore: use_build_context_synchronously
-                                              BlocProvider.of<AddClientBloc>(
-                                                      context)
-                                                  .add(
-                                                      AddClientSelectFirstDateCNIEvent(
-                                                          date1: pickedDate1));
-                                            }
-                                          },
+                                              /// check if date isn't null
+                                              if (pickedDate1 != null) {
+                                                // ignore: use_build_context_synchronously
+                                                BlocProvider.of<AddClientBloc>(
+                                                        context)
+                                                    .add(
+                                                        AddClientSelectFirstDateCNIEvent(
+                                                            date1:
+                                                                pickedDate1));
+                                              }
+                                            },
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 16.0),
-                                      Flexible(
-                                        child: TextFormField(
-                                          controller: secondDateCNIController,
-                                          readOnly: true,
-                                          autovalidateMode: AutovalidateMode
-                                              .onUserInteraction,
-                                          style: GoogleFonts.inter(
-                                              color: AppColors.colorTextInput,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w400),
-                                          cursorColor: AppColors.colorTextInput,
-                                          keyboardType: TextInputType.datetime,
-                                          decoration: InputDecoration(
-                                            errorStyle:
-                                                TextStyle(color: AppColors.red),
-                                            filled: true,
-                                            fillColor: AppColors.background2,
-                                            border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(16.0),
-                                                borderSide: BorderSide.none),
-                                            hintText:
-                                                AppLocalizations.of(context)!
-                                                    .date,
-                                            hintStyle: GoogleFonts.inter(
-                                                color: Colors.blue,
+                                        const SizedBox(width: 16.0),
+                                        Flexible(
+                                          child: TextFormField(
+                                            controller: secondDateCNIController,
+                                            readOnly: true,
+                                            autovalidateMode: AutovalidateMode
+                                                .onUserInteraction,
+                                            style: GoogleFonts.inter(
+                                                color: AppColors.colorTextInput,
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.w400),
+                                            cursorColor:
+                                                AppColors.colorTextInput,
+                                            keyboardType:
+                                                TextInputType.datetime,
+                                            decoration: InputDecoration(
+                                              errorStyle: TextStyle(
+                                                  color: AppColors.red),
+                                              filled: true,
+                                              fillColor: AppColors.background2,
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          16.0),
+                                                  borderSide: BorderSide.none),
+                                              hintText:
+                                                  AppLocalizations.of(context)!
+                                                      .datedelcni,
+                                              hintStyle: GoogleFonts.inter(
+                                                  color: Colors.blue,
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                            validator: (value) {
+                                              if (value!.isEmpty) {
+                                                return AppLocalizations.of(
+                                                        context)!
+                                                    .empty_input;
+                                              }
+                                              return null;
+                                            },
+                                            onTap: () async {
+                                              DateTime? pickedDate1 =
+                                                  await showDatePicker(
+                                                      context: context,
+                                                      keyboardType:
+                                                          TextInputType
+                                                              .datetime,
+                                                      initialDate:
+                                                          DateTime.now(),
+                                                      firstDate: DateTime(1900),
+                                                      lastDate: DateTime(3000));
+
+                                              /// check if date isn't null
+                                              if (pickedDate1 != null) {
+                                                // ignore: use_build_context_synchronously
+                                                BlocProvider.of<AddClientBloc>(
+                                                        context)
+                                                    .add(
+                                                        AddClientSelectSecondDateCNIEvent(
+                                                            date1:
+                                                                pickedDate1));
+                                              }
+                                            },
                                           ),
-                                          validator: (value) {
-                                            if (value!.isEmpty) {
-                                              return AppLocalizations.of(
-                                                      context)!
-                                                  .empty_input;
-                                            }
-                                            return null;
-                                          },
-                                          onTap: () async {
-                                            DateTime? pickedDate1 =
-                                                await showDatePicker(
-                                                    context: context,
-                                                    keyboardType:
-                                                        TextInputType.datetime,
-                                                    initialDate: DateTime.now(),
-                                                    firstDate: DateTime(1900),
-                                                    lastDate: DateTime(3000));
-
-                                            /// check if date isn't null
-                                            if (pickedDate1 != null) {
-                                              // ignore: use_build_context_synchronously
-                                              BlocProvider.of<AddClientBloc>(
-                                                      context)
-                                                  .add(
-                                                      AddClientSelectSecondDateCNIEvent(
-                                                          date1: pickedDate1));
-                                            }
-                                          },
                                         ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 16.0),
+                                    TextFormField(
+                                      controller: lieuCNIController,
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                      style: GoogleFonts.inter(
+                                          color: AppColors.colorTextInput,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w400),
+                                      cursorColor: AppColors.colorTextInput,
+                                      keyboardType: TextInputType.text,
+                                      decoration: InputDecoration(
+                                        errorStyle:
+                                            TextStyle(color: AppColors.red),
+                                        filled: true,
+                                        fillColor: AppColors.background2,
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(16.0),
+                                            borderSide: BorderSide.none),
+                                        labelText: AppLocalizations.of(context)!
+                                            .placecni,
+                                        labelStyle: GoogleFonts.inter(
+                                            color: Colors.blue,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w400),
+                                        hintText: AppLocalizations.of(context)!
+                                            .placecni,
+                                        hintStyle: GoogleFonts.inter(
+                                            color: Colors.grey,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w400),
                                       ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16.0),
-                                  TextFormField(
-                                    controller: lieuCNIController,
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    style: GoogleFonts.inter(
-                                        color: AppColors.colorTextInput,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w400),
-                                    cursorColor: AppColors.colorTextInput,
-                                    keyboardType: TextInputType.text,
-                                    decoration: InputDecoration(
-                                      errorStyle:
-                                          TextStyle(color: AppColors.red),
-                                      filled: true,
-                                      fillColor: AppColors.background2,
-                                      border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16.0),
-                                          borderSide: BorderSide.none),
-                                      labelText: AppLocalizations.of(context)!
-                                          .placecni,
-                                      labelStyle: GoogleFonts.inter(
-                                          color: Colors.blue,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w400),
-                                      hintText: AppLocalizations.of(context)!
-                                          .placecni,
-                                      hintStyle: GoogleFonts.inter(
-                                          color: Colors.grey,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w400),
+                                      validator: (value) {
+                                        if (value!.isEmpty) {
+                                          return AppLocalizations.of(context)!
+                                              .empty_input;
+                                        }
+                                        return null;
+                                      },
                                     ),
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return AppLocalizations.of(context)!
-                                            .empty_input;
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 16.0),
-                                  TextFormField(
-                                    controller: professionController,
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    style: GoogleFonts.inter(
-                                        color: AppColors.colorTextInput,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w400),
-                                    cursorColor: AppColors.colorTextInput,
-                                    keyboardType: TextInputType.text,
-                                    decoration: InputDecoration(
-                                      errorStyle:
-                                          TextStyle(color: AppColors.red),
-                                      filled: true,
-                                      fillColor: AppColors.background2,
-                                      border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16.0),
-                                          borderSide: BorderSide.none),
-                                      labelText: AppLocalizations.of(context)!
-                                          .profession,
-                                      labelStyle: GoogleFonts.inter(
-                                          color: Colors.blue,
+                                    const SizedBox(height: 16.0),
+                                    TextFormField(
+                                      controller: professionController,
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                      style: GoogleFonts.inter(
+                                          color: AppColors.colorTextInput,
                                           fontSize: 15,
                                           fontWeight: FontWeight.w400),
-                                      hintText: AppLocalizations.of(context)!
-                                          .profession,
-                                      hintStyle: GoogleFonts.inter(
-                                          color: Colors.grey,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w400),
+                                      cursorColor: AppColors.colorTextInput,
+                                      keyboardType: TextInputType.text,
+                                      decoration: InputDecoration(
+                                        errorStyle:
+                                            TextStyle(color: AppColors.red),
+                                        filled: true,
+                                        fillColor: AppColors.background2,
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(16.0),
+                                            borderSide: BorderSide.none),
+                                        labelText: AppLocalizations.of(context)!
+                                            .profession,
+                                        labelStyle: GoogleFonts.inter(
+                                            color: Colors.blue,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w400),
+                                        hintText: AppLocalizations.of(context)!
+                                            .profession,
+                                        hintStyle: GoogleFonts.inter(
+                                            color: Colors.grey,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      validator: (value) {
+                                        if (value!.isEmpty) {
+                                          return AppLocalizations.of(context)!
+                                              .empty_input;
+                                        }
+                                        return null;
+                                      },
                                     ),
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return AppLocalizations.of(context)!
-                                            .empty_input;
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  // Flexible(
-                                  //   child: DropdownButtonFormField(
-                                  //       items: const [
-                                  //         DropdownMenuItem(
-                                  //             value: 'Fr', child: Text("Fr")),
-                                  //         DropdownMenuItem(
-                                  //             value: 'En', child: Text("En")),
-                                  //       ],
-                                  //       decoration:
-                                  //           InputDecoration(border: OutlineInputBorder()),
-                                  //       value: selectedLangtype,
-                                  //       onChanged: (value) {
-                                  //         setState(() {
-                                  //           selectedLangtype = value!;
-                                  //         });
-                                  //       }),
-                                  // ),
+                                    // Flexible(
+                                    //   child: DropdownButtonFormField(
+                                    //       items: const [
+                                    //         DropdownMenuItem(
+                                    //             value: 'Fr', child: Text("Fr")),
+                                    //         DropdownMenuItem(
+                                    //             value: 'En', child: Text("En")),
+                                    //       ],
+                                    //       decoration:
+                                    //           InputDecoration(border: OutlineInputBorder()),
+                                    //       value: selectedLangtype,
+                                    //       onChanged: (value) {
+                                    //         setState(() {
+                                    //           selectedLangtype = value!;
+                                    //         });
+                                    //       }),
+                                    // ),
 
-                                  const SizedBox(height: 16.0),
-                                ],
-                              ),
-                            )
-                          ],
+                                    const SizedBox(height: 16.0),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                         isActive: currentStep >= 1)
                   ],
@@ -1106,45 +1353,90 @@ class _ClientScreenState extends State<ClientScreen> {
     );
   }
 
-  Widget controlsBuilder(BuildContext context, ControlsDetails details) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        ButtonComponent(
-            onPressed: details.onStepContinue,
-            child: currentStep > 0
-                ? InkWell(
-                    child: TypoText(
-                            text: AppLocalizations.of(context)!.validate,
-                            color: AppColors.colorTextWhite)
-                        .h2(),
-                    onTap: () {
-                      validate();
-                    },
-                  )
-                : InkWell(
-                    child: TypoText(
-                            text: AppLocalizations.of(context)!.next,
-                            color: AppColors.colorTextWhite)
-                        .h2(),
-                    onTap: () {
-                      nextstep();
-                    },
-                  ),
-            color: AppColors.backgroundButton),
-        InkWell(
-          onTap: () {
-            print("cancel");
-          },
-          child: ButtonComponent(
-              onPressed: details.onStepCancel,
-              child: TypoText(
-                      text: AppLocalizations.of(context)!.cancel,
-                      color: AppColors.backgroundButton)
-                  .h2(),
-              color: AppColors.background),
-        ),
-      ],
-    );
-  }
+//   Widget controlsBuilder(BuildContext context, ControlsDetails details) {
+//     return Row(
+//       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//       children: [
+//         ButtonComponent(
+//             onPressed: details.onStepContinue,
+//             child: currentStep > 0
+//                 ? InkWell(
+//                     child: TypoText(
+//                             text: AppLocalizations.of(context)!.validate,
+//                             color: AppColors.colorTextWhite)
+//                         .h2(),
+//                     onTap: () {
+//                       if (formKeyCNI.currentState!.validate()) {
+//                         // verificationstep2();
+//                         //if ((step1ok == true) && (step2ok == true)) {
+//                         final addclientModel = AddClientModel(
+//                           mobile: mobilecontroller.text.trim(),
+//                           username: nomController.text,
+//                           daten: firstDateCNIController.text.trim(),
+//                           lieun: lieuNController.text.trim(),
+//                           genre: selectedGenretype.toString(),
+//                           lang: selectedLangtype.toString(),
+//                           numcni: ncniController.text.trim(),
+//                           datecni: firstDateCNIController.text.trim(),
+//                           lieucni: lieuCNIController.text.trim(),
+//                           profession: professionController.text.trim(),
+//                           //idUser: firstDateCNIController.text.trim(),
+//                           //idAgence: lieuCNIController.text.trim(),
+//                           //idZone: professionController.text.trim(),
+//                         );
+
+//                         BlocProvider.of<AddClientBloc>(context)
+//                             .add(AddClientDataEvent(
+//                           addclientModel: addclientModel,
+//                         ));
+//                         showDialog(
+//                             context: context,
+//                             builder: (context) {
+//                               return AlertDialog(
+//                                 content: TypoText(
+//                                         text: AppLocalizations.of(context)!
+//                                             .loading,
+//                                         color: AppColors.colorTextWhite)
+//                                     .h2(),
+//                               );
+//                             });
+//                         //}
+//                       }
+//                     })
+//                 : InkWell(
+//                     child: TypoText(
+//                             text: AppLocalizations.of(context)!.next,
+//                             color: AppColors.colorTextWhite)
+//                         .h2(),
+//                     onTap: () {
+//                       if (formKeyClient.currentState!.validate()) {
+//                         verificationstep1();
+//                       }
+//                     },
+//                   ),
+//             color: AppColors.backgroundButton),
+//         InkWell(
+//           onTap: () {
+//             print("cancel");
+//           },
+//           child: ButtonComponent(
+//               onPressed: details.onStepCancel,
+//               child: TypoText(
+//                       text: AppLocalizations.of(context)!.cancel,
+//                       color: AppColors.backgroundButton)
+//                   .h2(),
+//               color: AppColors.background),
+//         ),
+//       ],
+//     );
+//   }
+
+  hideSnackBar(BuildContext context) => ScaffoldMessenger.of(context)
+      .hideCurrentSnackBar(reason: SnackBarClosedReason.dismiss);
+
+  showSnackBar(BuildContext context, String text, int duration) =>
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.backgroundButton,
+          duration: Duration(seconds: duration),
+          content: TypoText(text: text, color: Colors.white).h3()));
 }
